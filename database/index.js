@@ -1,10 +1,18 @@
-const {config} = require('../config.js');
-const {Client} = require('pg');
+const { Pool, Client } = require('pg');
 
-const client = new Client(config);
+const pool = new Pool({
+  host: 'localhost',
+  port: 5432,
+  user: 'me',
+  password: 'password',
+  database: 'product'
+})
 
-client.connect()
-  .then(res => console.log('successful connection'))
-  .catch(error => console.error('There was an error when connecting to database', error.stack));
 
-module.exports = client;
+pool.on('error', (err, client) => {
+  console.log(err)
+});
+
+pool.connect();
+
+module.exports = pool;

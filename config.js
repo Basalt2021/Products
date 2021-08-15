@@ -1,8 +1,8 @@
 const config = {
-  host: 'host',
-  user: 'user',
-  database: 'database_name',
-  password: '',
+  host: 'localhost',
+  user: 'me',
+  database: 'product',
+  password: 'password',
   port: 5432,
 };
 
