@@ -1,32 +1,61 @@
-const router = require('express').Router();
-const {getAll} = require('../database/index.js');
+const app = require('express').Router();
+const db = require('../database/index.js');
 
-router.get('/', (req, res) => {
-  res.send('GET ROUTER WORKS');
+app.get('/', (request, response) => {
+  db.getOneProduct(1).then(x => {
+    response.send(x.rows);
+  })
+  .catch(error => {
+    console.error('Cannot retrieve data', error);
+    response.status(400).send(error.stack);
+  });
 });
-router.get('/test', (req, res) => {
-  getAll()
-    .then(response => {
-      console.log('Success');
-      return res.send(response.rows);
+app.get('/products', (request, response) => {
+
+  db.getProducts(request.query.page || 1, request.query.count || 20)
+    .then(x => {
+      console.log('SUCCESS');
+      return response.send(x.rows);
     })
-    .catch(err => {
-      return console.error('cannot get data from database ', err)
+    .catch(error => {
+      console.error('Cannot retrieve data', error);
+      response.status(400).send(error.stack);
+    });
+});
+app.get('/products/:product_id', (request, response) => {
+  db.getOneProduct(request.params.product_id)
+    .then(x => {
+      response.send(x.rows);
     })
-  ;
+    .catch(error => {
+      console.error('Cannot retrieve data', error);
+      response.status(400).send(error.stack);
+    });
 });
-router.get('/products', (req, res) => {
-  res.send(req.query.page);
+app.get('/products/:product_id/related', (request, response) => {
+  db.getProductsRelated(request.params.product_id)
+    .then(x => {
+      console.log('SUCCESS', x);
+      return response.send(x.rows);
+    })
+    .catch(error => {
+      console.error('Cannot retrieve data', error);
+      response.status(400).send(error.stack);
+    });
 });
-router.get('/products/:product_id', (req, res) => {
-  res.send(req.params);
-});
-router.get('/products/:product_id/styles', (req, res) => {
-  res.send(req.params);
-});
-router.get('/products/:product_id/related', (req, res) => {
-  res.send(req.params);
+
+app.get('/products/:product_id/styles', (request, response) => {
+  db.getStyles(request.params.product_id)
+    .then(ret => {
+      console.log('SUCCESS');
+      return response.send(ret.rows[0]);
+    })
+    .catch(error => {
+      console.error('Cannot retrieve data', error);
+      response.status(400).send(error.stack);
+    });
 });
 
 
-module.exports.router = router;
+
+module.exports.router = app;
